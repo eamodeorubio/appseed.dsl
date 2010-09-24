@@ -4,4 +4,5 @@ build
 .classpath
 .settings
 .gradle
+scratchbook*.groovy
 
