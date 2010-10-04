@@ -20,7 +20,7 @@ class ValueDomain {
 		over.metaClass.getProperty << { String propName ->
 			def domain=DOMAINS[propName]
 			if(domain&&domain.over.isAssignableFrom(delegate.class))
-				return domain
+				return new Value(domain)
 			def metaProp = delegate.metaClass.getMetaProperty(propName)
 			if (metaProp) {
 				return metaProp.getValue(delegate)

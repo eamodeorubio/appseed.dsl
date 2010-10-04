@@ -7,11 +7,12 @@ import spock.lang.Specification;
 
 class AValueDomain extends Specification {
 	
-	def 'defined over a class, adds to that class\' instances a read only property returning the domain, only when enabled'(){
+	def 'defined over a class, when enabled, it adds to that class\' instances a read only property returning a value of that domain'(){
 		given: 'a domain "distance" created over a class and enabled'
 			def distance=new ValueDomain('distance', aClass, true)
-		expect: 'every instance of that class has a distance property returning the "distance" domain'
-			aValue.distance == distance
+		expect: 'every instance of that class has a distance property returning a value with domain "distance"'
+			def distanceValue=aValue.distance
+			distanceValue.domain == distance
 		
 		when: 'the domain is disabled and the read only property is accessed'
 			distance.enabled=false
@@ -36,7 +37,7 @@ class AValueDomain extends Specification {
 		when: 'the read only property is accessed in a non realated class instance'
 			aValue.distance
 		then: 'a missing property exception is thrown'
-			aClassInstance.distance == distance
+			aClassInstance.distance.domain == distance
 			thrown(MissingPropertyException)
 			
 		cleanup:
@@ -66,7 +67,7 @@ class AValueDomain extends Specification {
 			distance.enabled=false
 		then: 'another domain with the same name can be defined and used'
 			distance2=new ValueDomain('distance', otherClass, true)
-			aValue.distance == distance2
+			aValue.distance.domain == distance2
 			
 		cleanup:
 			distance2.enabled=false
@@ -91,7 +92,7 @@ class AValueDomain extends Specification {
 			distance.enabled = true
 			distance2.enabled = true
 		then: 'the first one is enabled but an exception is thrown for the second one'
-			aValue.distance == distance
+			aValue.distance.domain == distance
 			!distance2.enabled
 			thrown(Throwable)
 		
@@ -99,7 +100,7 @@ class AValueDomain extends Specification {
 			distance.enabled=false
 			distance2.enabled=true
 		then: 'the second one is active and the first one not'
-			aValue.distance == distance2
+			aValue.distance.domain == distance2
 			
 		cleanup:
 			distance2.enabled=false
@@ -119,10 +120,10 @@ class AValueDomain extends Specification {
 		given: 'a domain "distance" and other "weight", defined over the same class and both enabled'
 			def distance=new ValueDomain('distance', aClass, true)
 			def weight=new ValueDomain('weight', aClass, true)
-		expect: 'every instance of that class has a distance property returning the "distance" domain and a weight property returning the "weight" domain'
+		expect: 'every instance of that class has a distance property returning a "distance" value and a weight property returning a "weight" value'
 			weight != distance
-			aValue.distance == distance
-			aValue.weight == weight
+			aValue.distance.domain == distance
+			aValue.weight.domain == weight
 		
 		cleanup:
 			distance.enabled=false
