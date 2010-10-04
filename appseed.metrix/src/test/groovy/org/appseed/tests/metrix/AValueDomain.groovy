@@ -28,4 +28,27 @@ class AValueDomain extends Specification {
 			 467F      | Float
 			 12        | Integer
 	}
+	
+	def 'defined over a class will not affect other classes not extending that one'(){
+		given: 'a domain "distance" created over a class and enabled'
+			def distance=new ValueDomain('distance', aClass, true)
+		when: 'the read only property is accessed in a non realated class instance'
+			aValue.distance
+		then: 'a missing property exception is thrown'
+			thrown(MissingPropertyException)
+			
+		cleanup:
+			distance.enabled=false;
+		
+		where:
+			aValue     | aClass
+			-1.7       | Integer
+			 1.7       | String
+			'a string' | Boolean
+			 true      | String
+			 false     | Float
+			 467F      | Integer
+			 12        | Double
+		
+	}
 }
