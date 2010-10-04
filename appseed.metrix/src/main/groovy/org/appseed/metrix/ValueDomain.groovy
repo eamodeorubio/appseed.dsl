@@ -20,7 +20,7 @@ class ValueDomain {
 		over.metaClass.getProperty << { String propName ->
 			def domain=DOMAINS[propName]
 			if(domain&&domain.over.isAssignableFrom(delegate.class))
-				return new Value(domain)
+				return domain.valueProvider.newValue(delegate, domain)
 			def metaProp = delegate.metaClass.getMetaProperty(propName)
 			if (metaProp) {
 				return metaProp.getValue(delegate)
@@ -40,18 +40,20 @@ class ValueDomain {
 	private boolean enabled;
 	private String name;
 	private Class over;
+	private ValueProvider valueProvider
 	
-	def ValueDomain(String name, Class over, enabled=false) {
+	def ValueDomain(String name, Class over, ValueProvider provider, enabled=false) {
 		super()
-		this.name=name;
-		this.over=over;
+		this.name=name
+		this.over=over
+		this.valueProvider=provider
 		checkDomainIsNotRegistered this
 		setEnabled(enabled);
 		addDomainPropertyToClass over
 	}
 	
 	def ValueDomain(definition) {
-		this(definition.name, definition.over, definition.enabled?:false)
+		this(definition.name, definition.over, definition.valueProvider, definition.enabled?:false)
 	}
 		
 	def getName() {
@@ -71,11 +73,13 @@ class ValueDomain {
 		if(enabled!=newEnabled) {
 			if(newEnabled) {
 				checkDomainIsNotRegistered this
-				enabled=newEnabled
+				enabled=true
 				DOMAINS[name]=this
 			}
-			else
+			else{
+				enabled=false
 				DOMAINS.remove(name)
+			}
 		}
 	}
 }
