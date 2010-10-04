@@ -92,7 +92,7 @@ class AValueDomain extends Specification {
 			distance2.enabled = true
 		then: 'the first one is enabled but an exception is thrown for the second one'
 			aValue.distance == distance
-			assert !distance2.enabled
+			!distance2.enabled
 			thrown(Throwable)
 		
 		when: 'the first one is disabled and the other enabled'
