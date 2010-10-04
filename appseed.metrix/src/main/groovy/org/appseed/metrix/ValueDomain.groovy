@@ -30,6 +30,13 @@ class ValueDomain {
 		}
 	}
 	
+	private static ValueDomain checkDomainIsNotRegistered(ValueDomain aDomain) {
+		def activeDomain=DOMAINS[aDomain.name]
+		if(activeDomain&&activeDomain!=aDomain)
+			throw new RuntimeException("Cannot create a new ValueDomain called '${aDomain.name}' over class ${aDomain.over}. There is one already active")
+		return aDomain
+	}
+	
 	private boolean enabled;
 	private String name;
 	private Class over;
@@ -38,6 +45,7 @@ class ValueDomain {
 		super()
 		this.name=name;
 		this.over=over;
+		checkDomainIsNotRegistered this
 		setEnabled(enabled);
 		addDomainPropertyToClass over
 	}
@@ -61,9 +69,11 @@ class ValueDomain {
 	def setEnabled(isEnabled) {
 		def newEnabled=isEnabled as Boolean
 		if(enabled!=newEnabled) {
-			enabled=newEnabled
-			if(enabled)
+			if(newEnabled) {
+				checkDomainIsNotRegistered this
+				enabled=newEnabled
 				DOMAINS[name]=this
+			}
 			else
 				DOMAINS.remove(name)
 		}
